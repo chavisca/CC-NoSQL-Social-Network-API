@@ -28,13 +28,17 @@ const userSchema = new Schema(
     friends: [{
         type: Schema.Types.ObjectId,
         ref: 'User' }],
-  }, // Add virtual called friendCount to retrieve length of friends array on query
+  }, 
   {
     toJSON: {
       getters: true,
     },
   }
 );
+
+userSchema.virtual('friendCount').get(function () {
+  return this.friends.length;
+});
 
 const User = model('user', userSchema);
 
