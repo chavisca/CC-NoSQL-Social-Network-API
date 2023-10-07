@@ -3,6 +3,7 @@ const {
   getUsers,
   getSingleUser,
   createUser,
+  // add update user and route below
   deleteUser,
   addReaction,
   removeReaction,
