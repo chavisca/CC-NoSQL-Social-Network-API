@@ -1,7 +1,5 @@
 ## ToDo:    
-+ Create seed data and seed script
 + Move Reaction schema as a subdocument into Thought model
-+ Create getter methods for timestamps of thought and reaction
 + Create updateUser PUT route in userController
 + Create updateThought PUT route in thoughtController
 + Create cascade to delete userThoughts when user is deleted

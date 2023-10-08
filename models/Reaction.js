@@ -19,7 +19,6 @@ const reactionSchema = new Schema(
     createdAt: {
       type: Date,
       default: Date.now,
-      // add getter method to format timestamp on query
     },
   },
   {
@@ -29,5 +28,9 @@ const reactionSchema = new Schema(
     id: false,
   }
 );
+
+reactionSchema.path('createdAt').get(function(createdAt) {
+  return createdAt.toISOString();
+});
 
 module.exports = reactionSchema; // Should not be a model, move to reaction fields subdocument schema in Thought model
