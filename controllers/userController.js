@@ -8,8 +8,7 @@ module.exports = {
       const users = await User.find();
 
       const userObj = {
-        users,
-        headCount: await headCount(),
+        users
       };
 
       res.json(userObj);
@@ -29,8 +28,7 @@ module.exports = {
       }
 
       res.json({
-        student,
-        grade: await grade(req.params.userId),
+        user
       });
     } catch (err) {
       console.log(err);
@@ -56,7 +54,7 @@ module.exports = {
       }
 
       const thought = await Thought.findOneAndUpdate( //switch to many
-        { students: req.params.userId },
+        { users: req.params.userId },
         { $pull: { users: req.params.userId } },
         { new: true }
       );
@@ -73,5 +71,29 @@ module.exports = {
       res.status(500).json(err);
     }
   },
-};
+  async updateUser(req, res) {
+    try {
+      const { userId } = req.params;
+      const { username, email } = req.body;
+      const user = await User.findbyId(userId);
 
+      if (!user) {
+        return res.status(404).json({ message: 'No user with that ID' })
+      }
+
+      if (username) {
+        user.username = username;
+      }
+
+      if (email) {
+        user.email = email;
+      }
+
+      const updatedUser = await user.save();
+
+      res.json({ message: 'User successfully updated', user: updatedUser });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  }

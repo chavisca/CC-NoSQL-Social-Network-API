@@ -53,19 +53,28 @@ module.exports = {
   // Update a thought
   async updateThought(req, res) {
     try {
-      const thought = await Thought.findOneAndUpdate(
-        { _id: req.params.thoughtId },
-        { $set: req.body },
-        { runValidators: true, new: true }
-      );
+      const { thoughtId } = req.params;
+      const { username, thoughtText } = req.body;
+      const thought = await Thought.findbyId(thoughtId);
 
       if (!thought) {
-        res.status(404).json({ message: 'No thought with this id!' });
+        return res.status(404).json({ message: 'No thought with that ID' })
       }
 
-      res.json(thought);
+      if (username) {
+        thought.username = username;
+      }
+
+      if (thoughtText) {
+        thought.thoughtText = thoughtText;
+      }
+
+      const updatedThought = await thought.save();
+
+      res.json({ message: 'Thought successfully updated', thought: updatedThought });
     } catch (err) {
-      res.status(500).json(err);
+      console.error(err);
+      res.status(500).json({ message: 'Internal Server Error' });
     }
   },
 
