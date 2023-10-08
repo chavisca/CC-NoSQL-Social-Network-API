@@ -49,6 +49,6 @@ const emails = [
 const users = [];
 const getUserName = () => usernames[Math.floor(Math.random() * usernames.length)];
 const getEmail = () => emails[Math.floor(Math.random() * emails.length)];
-const getRandomName = () => `${getUserName()} ${getEmail()}`;
+const getRandomSet = () => `${getUserName()} ${getEmail()}`;
 
-module.exports = getRandomName;
+module.exports = getRandomSet;
