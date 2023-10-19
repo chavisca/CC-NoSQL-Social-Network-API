@@ -28,8 +28,19 @@ module.exports = {
   // Create a thought
   async createThought(req, res) {
     try {
-      const thought = await Thought.create(req.body);
-      res.json(thought);
+      const { thoughtText, username } = req.body;
+      const user = await User.findOne ({ username });
+
+      if (!user) {
+        return res.status(404).json({ message: 'No user with that username' });
+      }
+
+      const thought = await Thought.create({ thoughtText, username });
+
+      user.thoughts.push(thought._id);
+      await user.save();
+
+      res.json({ message: 'Thought created and added to user', thought });
     } catch (err) {
       console.log(err);
       return res.status(500).json(err);
@@ -38,14 +49,27 @@ module.exports = {
   // Delete a thought
   async deleteThought(req, res) {
     try {
-      const thought = await Thought.findOneAndDelete({ _id: req.params.thoughtId });
+      const thoughtId = req.params.thoughtId;
+      const thought = await Thought.findOne({ _id: thoughtId });
 
       if (!thought) {
         res.status(404).json({ message: 'No thought with that ID' });
       }
+      
+      const username = thought.username;
+      const user = await User.findOne({ username });
 
-      await User.deleteMany({ _id: { $in: thought.users } });
-      res.json({ message: 'Thought and Users deleted!' });
+      if (user) {
+        const thoughtIndex = user.thoughts.indexOf(thought._id);
+        if (thoughtIndex === -1) {
+          user.thoughts.splice(thoughtIndex, 1);
+          await user.save();
+        }
+      }
+
+      await thought.delete();
+
+      res.json({ message: 'Thought and User references deleted!' });
     } catch (err) {
       res.status(500).json(err);
     }
@@ -77,48 +101,47 @@ module.exports = {
       res.status(500).json({ message: 'Internal Server Error' });
     }
   },
-
-  // Add a reaction to a user
   async addReaction(req, res) {
-    console.log('You are adding a reaction');
-    console.log(req.body);
-
     try {
-      const user = await User.findOneAndUpdate(
-        { _id: req.params.userId },
-        { $addToSet: { assignments: req.body } },
-        { runValidators: true, new: true }
-      );
+      const thoughtId = req.params.thoughtId;
+      const reactionData = req.body;
 
-      if (!user) {
-        return res
-          .status(404)
-          .json({ message: 'No user found with that ID' });
+      const thought = await Thought.findById(thoughtId);
+
+      if (!thought) {
+        return res.status(404).json({ message: 'No thought with that ID' });
       }
 
-      res.json(user);
+      thought.reactions.push(reactionData);
+      await thought.save();
+
+      res.json({ message: 'Reaction added successfully', thought });
     } catch (err) {
-      res.status(500).json(err);
+      console.log(err);
+      return res.status(500).json({ message: 'Internal Server Error' });
     }
   },
-  // Remove reaction from a user
   async removeReaction(req, res) {
     try {
-      const user = await User.findOneAndUpdate(
-        { _id: req.params.userId },
-        { $pull: { assignment: { assignmentId: req.params.userId } } },
-        { runValidators: true, new: true }
-      );
+      const thoughtId = req.params.thoughtId;
+      const reactionId = req.params.reactionId;
 
-      if (!user) {
-        return res
-          .status(404)
-          .json({ message: 'No user found with that ID' });
+      const thought = await Thought.findById(thoughtId);
+
+      if (!thought) {
+        return res.status(404).json({ message: 'No thought with that ID' });
       }
 
-      res.json(user);
+      const reactionIndex = thought.reactions.findIndex((reaction) => reaction._id.toString() === reactionId);
+
+      thought.reactions.splice(reactionIndex, 1);
+      await thought.save();
+
+      res.json({ message: 'Reaction removed successfully', thought });
     } catch (err) {
-      res.status(500).json(err);
+      console.log(err);
+      return res.status(500).json({ message: 'Internal Server Error' });
     }
   }
+
 };

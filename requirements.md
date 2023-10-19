@@ -1,9 +1,4 @@
 ## ToDo:    
-+ Create updateUser PUT route in userController
-+ Create updateThought PUT route in thoughtController
-+ Create cascade to delete userThoughts when user is deleted
-+ Create POST/DELETE routes for adding and removing friends in userController
-+ Review POST route for creating thoughts for associated push to user's array
 + Deploy on Heroku for testing
 + Create walkthrough video after testing
 

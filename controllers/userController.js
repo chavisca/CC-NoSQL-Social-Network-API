@@ -97,5 +97,57 @@ module.exports = {
       console.error(err);
       res.status(500).json({ message: 'Internal Server Error' });
     }
+  },
+  async addFriend(req, res) {
+    try {
+      const userId = req.params.userId;
+      const friendUsername = req.body.friendUsername;
+
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({ message: 'No user with that ID' })
+      }
+      
+      const friend = await User.findOne({ username: friendUsername });
+
+      if (!friend) {
+        return res.status(404).json({ message: 'No user with that username' })
+      }
+
+      user.friends.push(friend._id);
+      await user.save();
+
+      res.json({ message: 'Friend added successfully', user });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  },
+  async removeFriend(req, res) {
+    try {
+      const userId = req.params.userId;
+      const friendId = req.body.friendId;
+
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({ message: 'No user with that ID' })
+      }
+      
+      const friendIndex = user.friends.indexOf(friendId);
+
+      if (friendIndex === -1) {
+        return res.status(404).json({ message: 'Friend not found in user\'s friend list' })
+      }
+
+      user.friends.splice(friendIndex, 1);
+      await user.save();
+
+      res.json({ message: 'Friend removed successfully', user });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
   }
 }
