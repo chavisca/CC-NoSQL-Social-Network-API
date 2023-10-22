@@ -15,6 +15,7 @@ This was created using the MIT License for educational purposes only.
 All routes were tested in Insomnia for functionality and intended use.
 
 ## Link to Video Walkthrough
+https://drive.google.com/file/d/1ZixX5BwQt0NPsukWKGlPKzbLQweTuQ-h/view?usp=share_link
 
 ## Link to Github
 https://chavisca.github.io/CC-NoSQL-Social-Network-API
