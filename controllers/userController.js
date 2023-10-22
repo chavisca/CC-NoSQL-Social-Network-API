@@ -101,7 +101,7 @@ module.exports = {
   async addFriend(req, res) {
     try {
       const userId = req.params.userId;
-      const friendUsername = req.body.friendUsername;
+      const friendId = req.params.friendId;
 
       const user = await User.findById(userId);
 
@@ -109,13 +109,17 @@ module.exports = {
         return res.status(404).json({ message: 'No user with that ID' })
       }
       
-      const friend = await User.findOne({ username: friendUsername });
-
-      if (!friend) {
-        return res.status(404).json({ message: 'No user with that username' })
+      if (!user.friends) {
+        user.friends = [];
       }
 
-      user.friends.push(friend._id);
+      const friend = await User.findById(friendId);
+
+      if (!friend) {
+        return res.status(404).json({ message: 'No friend with that ID' })
+      }
+
+      user.friends.push(friendId);
       await user.save();
 
       res.json({ message: 'Friend added successfully', user });
@@ -127,7 +131,7 @@ module.exports = {
   async removeFriend(req, res) {
     try {
       const userId = req.params.userId;
-      const friendId = req.body.friendId;
+      const friendId = req.params.friendId;
 
       const user = await User.findById(userId);
 
@@ -135,6 +139,10 @@ module.exports = {
         return res.status(404).json({ message: 'No user with that ID' })
       }
       
+      if (!user.friends) {
+        user.friends = [];
+      }
+
       const friendIndex = user.friends.indexOf(friendId);
 
       if (friendIndex === -1) {
