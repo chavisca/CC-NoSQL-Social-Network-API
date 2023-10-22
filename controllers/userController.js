@@ -55,11 +55,11 @@ module.exports = {
         return res.status(404).json({ message: 'No such user exists' });
       }
 
-      const thought = await Thought.deleteMany(
-        { users: userId },
+      const thoughtsDeleted = await Thought.deleteMany(
+        { users: req.params.userId }
       );
 
-      if (!thought) {
+      if (!thoughtsDeleted) {
         return res.status(404).json({
           message: 'User deleted, but no thoughts found',
         });
@@ -76,7 +76,7 @@ module.exports = {
     try {
       const { userId } = req.params;
       const { username, email } = req.body;
-      const user = await User.findbyId(userId);
+      const user = await User.findById(userId);
 
       if (!user) {
         return res.status(404).json({ message: 'No user with that ID' })
