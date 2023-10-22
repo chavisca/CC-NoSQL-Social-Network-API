@@ -35,10 +35,10 @@ module.exports = {
         return res.status(404).json({ message: 'No user with that username' });
       }
 
-      const thought = await Thought.create({ thoughtText, username });
+      const thought = await Thought.create({ thoughtText, username, users: [user._id] });
 
       user.thoughts.push(thought._id);
-      await user.save();
+      await Promise.all([user.save(), thought.save()]);
 
       res.json({ message: 'Thought created and added to user', thought });
     } catch (err) {

@@ -4,8 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "node index",
-    "seed": "node utils/seed"
+    "start": "node index"
   },
   "dependencies": {
     "express": "^4.18.2",
