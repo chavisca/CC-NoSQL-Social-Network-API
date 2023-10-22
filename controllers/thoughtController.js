@@ -50,24 +50,28 @@ module.exports = {
   async deleteThought(req, res) {
     try {
       const thoughtId = req.params.thoughtId;
-      const thought = await Thought.findOne({ _id: thoughtId });
+      const thought = await Thought.findById(thoughtId);
 
       if (!thought) {
         res.status(404).json({ message: 'No thought with that ID' });
       }
-      
+
       const username = thought.username;
       const user = await User.findOne({ username });
 
-      if (user) {
-        const thoughtIndex = user.thoughts.indexOf(thought._id);
-        if (thoughtIndex === -1) {
+      if (!user.thoughts) {
+        user.thoughts = [];
+      }
+
+        const thoughtIndex = user.thoughts.indexOf(thoughtId);
+        console.log(thoughtIndex);
+        if (thoughtIndex !== -1) {
           user.thoughts.splice(thoughtIndex, 1);
           await user.save();
         }
-      }
-
-      await thought.delete();
+      
+      await thought.deleteOne({ _id: thoughtId });
+      
 
       res.json({ message: 'Thought and User references deleted!' });
     } catch (err) {
@@ -79,7 +83,7 @@ module.exports = {
     try {
       const { thoughtId } = req.params;
       const { username, thoughtText } = req.body;
-      const thought = await Thought.findbyId(thoughtId);
+      const thought = await Thought.findById(thoughtId);
 
       if (!thought) {
         return res.status(404).json({ message: 'No thought with that ID' })
